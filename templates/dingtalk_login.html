@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Dingtalk Login</title>
+    <script src="//g.alicdn.com/dingding/dingtalk-pc-api/2.5.0/index.js?spm=a219a.7629140.0.0.enxbps&file=index.js"></script>
+  </head>
+  <body>
+    <div id="notify"></div>
+    <script>
+      var next_url = '';
+      if(typeof window.URLSearchParams != 'undefined'){
+          next_url = new URLSearchParams(location.search).get("next") || '';
+      }
+      function notify(msg){
+          document.getElementById("notify").innerHTML = msg;
+      }
+      var dd = DingTalkPC;
+      dd.ready(function(){
+          dd.runtime.permission.requestAuthCode({
+            corpId: "{{ dingtalk_data.corpId }}",
+            onSuccess: function(result){
+                DingTalkPC.biz.util.openLink({url: location.protocol
+                                                   + "//" + location.host
+                                                   + "/pauli/auth/web/dingtalk/success?code="
+                                                   + result.code
+                                                   + "&next="
+                                                   + encodeURIComponent(next_url)});
+            },
+            onFail: function(err){
+                notify("permission error: " + JSON.stringify(err));
+            }
+          });
+      });
+
+      dd.error(function(err){
+          notify("global error: " + JSON.stringify(err));
+      });
+
+      dd.config({
+        agentId: "{{ dingtalk_data.agentId }}",
+        corpId: "{{ dingtalk_data.corpId }}",
+        timeStamp: "{{ dingtalk_data.timeStamp }}",
+        nonceStr: "{{ dingtalk_data.nonceStr }}",
+        signature: "{{ dingtalk_data.signature }}",
+        jsApiList: ['runtime.info', 'runtime.permission.requestAuthCode']
+      });
+
+    </script>
+  </body>
+</html>
