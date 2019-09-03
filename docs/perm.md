@@ -45,9 +45,9 @@ __Params__
 __Return__
 - result
     - triple
-        - '*': 如果无此权限为False，某则为True
-        - '+': 如果无此权限为False，某则为用户被授权过得全部position\_id的list
-        - '-': 如果无此权限为False，某则为用户的user_id
+        - '*': 如果无此权限为False，否则为True
+        - '+': 如果无此权限为False，否则为用户被授权过得全部position\_id的list
+        - '-': 如果无此权限为False，否则为用户的user_id
 
 
 ## POST /pauli/perm/api/perm/triples
@@ -59,9 +59,9 @@ __Params__
 __Return__
 - result
     - triples: dict，每个项目的key为action本身，value为如下的dict 
-        - '*': 如果无此权限为False，某则为True
-        - '+': 如果无此权限为False，某则为用户被授权过得全部position\_id的list
-        - '-': 如果无此权限为False，某则为用户的user_id
+        - '*': 如果无此权限为False，否则为True
+        - '+': 如果无此权限为False，否则为用户被授权过得全部position\_id的list
+        - '-': 如果无此权限为False，否则为用户的user_id
 
 
 ## PUT /pauli/perm/api/perm/user/add
