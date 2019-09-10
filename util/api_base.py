@@ -39,6 +39,7 @@ STATUS_CODES = {
     'E_USER_AUTH_NOT_EXIST': (1020, '手机号码不存在，无法获取验证码'),
     'E_USER_AUTH_PWD_VERIFY_INVALID': (1021, '密码格式不正确'),
     'E_USER_ORG_LOGIN_PWD_ERROR': (1022, '原登录密码错误'),
+    'USER_NEED_SMS_AUTH': (1023, '需要进行短信验证')
 }
 
 
