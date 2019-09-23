@@ -44,7 +44,6 @@ STATUS_CODES = {
 
 
 def send_json_result(code, result=None, msg=None):
-    print(code, type(code))
     sc_code = 'E_%s' % code if isinstance(code, str) else code
     status = STATUS_CODES.get(sc_code)
     ret = json.dumps({'code': status[0],
