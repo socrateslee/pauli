@@ -207,13 +207,24 @@ def get_all_roles(soft_del=False):
     return list(roles)
 
 
-def create_role(name=None):
+def get_role_by_foreign_key(foreign_key):
+    if not foreign_key:
+        return None
+    role_desc = RoleDesc.objects(foreign_key=foreign_key,
+                                 soft_del=False).first()
+    return role_desc
+
+
+def create_role(name=None, foreign_key=None):
     if not name:
         return False, "角色名未提供"
     role_desc = RoleDesc.objects(name=name, soft_del=False).first()
     if role_desc:
         return False, "角色名已经存在"
-    role_desc = RoleDesc(name=name)
+    role_desc = get_role_by_foreign_key(foreign_key)
+    if role_desc:
+        return False, "外键已经存在"
+    role_desc = RoleDesc(name=name, foreign_key=foreign_key)
     role_desc.save()
     return get_role_info(role_desc)
 
@@ -259,6 +270,7 @@ def get_role_info(role=None, role_id=None, role_name=None):
            'name': str(role.name),
            'perms': role.perms,
            'granted_positions': role.granted_positions,
+           'foreign_key': role.foreign_key,
            'created': str(role.created),
            'soft_del': role.soft_del,
            'lut': str(role.lut)}

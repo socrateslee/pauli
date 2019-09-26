@@ -22,19 +22,21 @@ class PermDesc(Document):
 
 
 @db_util.change_lut_on_save
-class RoleDesc(Document):
+class RoleDesc(DynamicDocument):
     meta = {"db_alias": "pauli",
-            "indexes": []}
+            "indexes": ["foreign_key"]}
     name = StringField()
     perms = ListField()
     granted_positions = ListField()
+    foreign_key = StringField()
+    info = DictField()
     created = DateTimeField(default=datetime.datetime.now)
     soft_del = BooleanField(default=False)
     lut = DateTimeField(default=datetime.datetime.now)
 
 
 @db_util.change_lut_on_save
-class PositionDesc(Document):
+class PositionDesc(DynamicDocument):
     '''
     职位描述，每个用户通过关联职位描述来确定上下级关系和数据集权限
     --------
@@ -44,11 +46,16 @@ class PositionDesc(Document):
     position_type: string, 职位的类型，用于区分一些特殊的职位，比如理财顾问
     '''
     meta = {"db_alias": "pauli",
-            "indexes": ['parent_id', 'path', 'name']}
+            "indexes": ['parent_id',
+                        'foreign_key',
+                        'path',
+                        'name']}
     name = StringField()
     parent_id = StringField(default='')
     path = ListField()
     position_type = StringField(default='')
+    foreign_key = StringField()
+    info = DictField()
     created = DateTimeField(default=datetime.datetime.now)
     soft_del = BooleanField(default=False)
     lut = DateTimeField(default=datetime.datetime.now)

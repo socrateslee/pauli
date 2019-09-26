@@ -11,6 +11,8 @@ from . import user_perm as user_perm_ops
 def position_to_dict(position):
     ret = {'id': str(position.id),
            'name': position.name,
+           'foreign_key': foreign_key,
+           'info': info,
            'parent_id': position.parent_id}
     return ret
 
@@ -222,7 +224,19 @@ def position_ids_by_names(names):
     return list(map(lambda x: str(x.id), positions))
 
 
-def add_position(name, parent_id=None, parent_name=None, allow_duplicate=False):
+def get_position_by_foreign_key(foreign_key):
+    if not foreign_key:
+        return None
+    position = PositionDesc.objects(foreign_key=foreign_key,
+                                    soft_del=False).first()
+    return position
+
+
+def add_position(name,
+                 parent_id=None,
+                 parent_name=None,
+                 foreign_key=None,
+                 allow_duplicate=False):
     cache_key = "position"
     if parent_name and not parent_id and not allow_duplicate:
         parent_position = PositionDesc.objects(soft_del=False,
@@ -230,6 +244,9 @@ def add_position(name, parent_id=None, parent_name=None, allow_duplicate=False):
         if parent_position:
             parent_id = str(parent_position.id)
     with cache_lock(cache_key):
+        position = get_position_by_foreign_key(foreign_key)
+        if position:
+            return False, "外键已经存在"
         position = PositionDesc.objects(soft_del=False, name=name).first()
         if allow_duplicate is not True and position:
             return False, "职位或团队名称重复"
@@ -238,7 +255,9 @@ def add_position(name, parent_id=None, parent_name=None, allow_duplicate=False):
             parent = PositionDesc.objects(soft_del=False, id=parent_id).first()
             if not parent:
                 return False, "职位或团队的上级职位不存在"
-        position = PositionDesc(name=name, parent_id=parent_id)
+        position = PositionDesc(name=name,
+                                parent_id=parent_id,
+                                foreign_key=foreign_key)
         if parent:
             position.path = parent.path + [parent_id]
         position.save()
