@@ -18,6 +18,7 @@ def to_dict(user, with_info=False, fields=None):
     ret['mobile'] = user.info.get('mobile') or ''
     ret['position_id'] = user.info.get('position_id') or ''
     ret['position_name'] = user.info.get('position_name') or ''
+    ret['position_tags'] = user.info.get('position_tags') or []
     ret['creator_id'] = user.info.get('creator_id') or ''
     ret['creator_name'] = user.info.get('creator_name') or ''
     ret['role_names'] = user.info.get('role_names') or []
@@ -73,11 +74,14 @@ def query_users(keyword):
 
 def query_by_info(query_type, query_value):
     q = {'soft_del': False}
-    if query_type in ['email', 'mobile']:
+    if query_type in ['email',
+                      'mobile',
+                      'jobnumber',
+                      'position_name']:
         q["info__%s" % query_type] = query_value
-    else:
-        if query_type == 'role_name':
-            q['info__role_names'] = query_value
+    elif query_type in ['role_name',
+                        'position_tag']:
+            q['info__%ss' % query_type] = query_value
     return User.objects(**q)
 
 

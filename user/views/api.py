@@ -104,11 +104,18 @@ def api_user_query():
 @perm_required()
 def api_user_query_by_info():
     '''
-    根据用户info中的信息查询用户列表，仅限email、mobile和role_name
+    根据用户info中的信息查询用户列表，仅限email、mobile、jobnumber、
+    position_name、position_tag和role_name
     '''
     query_type = flask.request.args.get('query_type')
     query_value = flask.request.args.get('query_value')
-    if query_type not in ['email', 'mobile', 'role_name'] or not query_value:
+    permitted_types = ['email',
+                       'mobile',
+                       'jobnumber',
+                       'position_name',
+                       'position_tag',
+                       'role_name']
+    if query_type not in permitted_types or not query_value:
         return api_base.send_json_result("PARAM")
     query = user_base.query_by_info(query_type, query_value)
     users = [user_base.to_dict(user) for user in query]

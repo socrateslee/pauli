@@ -48,6 +48,7 @@ class PositionDesc(DynamicDocument):
     meta = {"db_alias": "pauli",
             "indexes": ['parent_id',
                         'foreign_key',
+                        'tags',
                         'path',
                         'name']}
     name = StringField()
@@ -55,6 +56,7 @@ class PositionDesc(DynamicDocument):
     path = ListField()
     position_type = StringField(default='')
     foreign_key = StringField()
+    tags = ListField()
     info = DictField()
     created = DateTimeField(default=datetime.datetime.now)
     soft_del = BooleanField(default=False)
