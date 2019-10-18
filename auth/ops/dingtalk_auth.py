@@ -76,7 +76,7 @@ def set_user_info_from_dingtalk(user, dingtalk_info, overwrite=False):
     user.info['dingtalk_id'] = dingtalk_info['userid']
     for field in fields:
         if user.info.get(field) != dingtalk_info.get(field):
-            if user.info.get(field) is not None and not overwrite:
+            if user.info.get(field) and not overwrite:
                 continue
             user.info[field] = dingtalk_info.get(field)
 
