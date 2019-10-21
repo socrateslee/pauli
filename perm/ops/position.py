@@ -177,6 +177,7 @@ def set_position(user_id, position_id):
         user.info['position_id'] = position_id
         user.info['position_name'] = position.name if position else ""
         user.info['position_tags'] = position.tags if position else []
+        user.info['position_path'] = position.path if position else []
         user.save()
         return True, user_perm
 
