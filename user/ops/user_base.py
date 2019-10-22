@@ -19,6 +19,7 @@ def to_dict(user, with_info=False, fields=None):
     ret['position_id'] = user.info.get('position_id') or ''
     ret['position_name'] = user.info.get('position_name') or ''
     ret['position_tags'] = user.info.get('position_tags') or []
+    ret['position_path'] = user.info.get('position_path') or []
     ret['creator_id'] = user.info.get('creator_id') or ''
     ret['creator_name'] = user.info.get('creator_name') or ''
     ret['role_names'] = user.info.get('role_names') or []
