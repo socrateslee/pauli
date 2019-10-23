@@ -327,14 +327,21 @@ def rename_position(position_id, new_name, allow_duplicate=False):
         return True, position
 
 
-def position_tree(position_ids, extend_users=False):
+def position_tree(position_ids,
+                  extend_users=False,
+                  extra_fields=None):
     '''
     获取职位的树形结构
     '''
     def convert(obj):
-        return {'label': obj.name,
-                'value': str(obj.id),
-                'children': []}
+        ret = {'label': obj.name,
+               'value': str(obj.id),
+               'children': []}
+        for field in extra_fields:
+            ret[field] = getattr(obj, field, None)
+        return ret
+    if extra_fields is None:
+        extra_fields = []
     positions = get_sub_positions(position_ids, included=True)
     all_ids = set(map(lambda x: str(x.id), positions))
 

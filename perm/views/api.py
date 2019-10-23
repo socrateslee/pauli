@@ -538,14 +538,20 @@ def api_position_leaders_info():
 def api_position_tree():
     extend = True if flask.request.args.get('extend') else False
     position_id = flask.request.args.get('position_id')
+    extra_fields = flask.request.args.getlist('extra_fields')
+    granted_position_ids = position_ops.get_granted_position_ids(flask.session["user_id"])
     if position_id:
-        if user_perm.has_perm(flask.session["user_id"], 'pauli:perm:position:list'):
-            granted_position_ids = [position_id]
+        if position_id in granted_position_ids:
+            target_position_ids = [position_id]
+        elif user_perm.has_perm(flask.session["user_id"], 'pauli:perm:position:list'):
+            target_position_ids = [position_id]
         else:
             return api_base.send_json_result("FORBIDDEN", msg="用户不是所传职位的上级用户")
     else:
-        granted_position_ids = position_ops.get_granted_position_ids(flask.session["user_id"])
-    ret = position_ops.position_tree(granted_position_ids, extend_users=extend)
+        target_position_ids = granted_position_ids
+    ret = position_ops.position_tree(target_position_ids,
+                                     extend_users=extend,
+                                     extra_fields=extra_fields)
     return api_base.send_json_result("SUCC", result={'tree': ret})
 
 
