@@ -538,7 +538,9 @@ def api_position_leaders_info():
 def api_position_tree():
     extend = True if flask.request.args.get('extend') else False
     position_id = flask.request.args.get('position_id')
-    extra_fields = flask.request.args.getlist('extra_fields')
+    extra_fields = flask.request.args.get('extra_fields') or []
+    if extra_fields:
+        extra_fields = extra_fields.split(',')
     granted_position_ids = position_ops.get_granted_position_ids(flask.session["user_id"])
     if position_id:
         if position_id in granted_position_ids:
