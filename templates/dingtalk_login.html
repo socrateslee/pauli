@@ -24,6 +24,7 @@
                                                    + result.code
                                                    + "&next="
                                                    + encodeURIComponent(next_url)});
+                notify("请在系统浏览器中察看");
             },
             onFail: function(err){
                 notify("permission error: " + JSON.stringify(err));
