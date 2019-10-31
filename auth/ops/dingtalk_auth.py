@@ -72,7 +72,7 @@ def set_user_info_from_dingtalk(user, dingtalk_info, overwrite=False):
     '''
     Set user.info based on dingtalk_info.
     '''
-    fields = ['name', 'email', 'mobile', 'jobnumber']
+    fields = ['name', 'email', 'mobile', 'jobnumber', 'avatar']
     user.info['dingtalk_id'] = dingtalk_info['userid']
     for field in fields:
         if user.info.get(field) != dingtalk_info.get(field):

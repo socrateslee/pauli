@@ -25,6 +25,7 @@ def to_dict(user, with_info=False, fields=None):
     ret['role_names'] = user.info.get('role_names') or []
     ret['dingtalk_id'] = user.info.get('dingtalk_id') or ''
     ret['jobnumber'] = user.info.get('jobnumber') or ''
+    ret['avatar'] = user.info.get('avatar') or ''
 
     if with_info:
         ret['info'] = user.info
