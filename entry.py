@@ -16,7 +16,7 @@ def setup_pauli(flask_app, url_prefix="/pauli"):
     # setup session
     session_db = mongoengine.connection.get_db(alias="pauli")
     config_dict = {
-        "SESSION_COOKIE_NAME": "sessionid",
+        "SESSION_COOKIE_NAME": conf.SESSION_COOKIE_NAME,
         "SESSION_TYPE": "mongodb",
         "SESSION_MONGODB": session_db.client,
         "SESSION_MONGODB_DB": session_db.name,
