@@ -31,7 +31,9 @@ def logined():
 @pauli_root.route('/auth/api/logout', methods=['GET'])
 def logout():
     common.logout(flask.request, flask.session)
-    return api_base.send_json_result("SUCC")
+    resp = api_base.send_json_result("SUCC")
+    resp.set_cookie(conf.SESSION_COOKIE_NAME, "", expires=0)
+    return resp
 
 
 @pauli_root.route('/auth/api/record', methods=['GET'])
