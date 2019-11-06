@@ -219,7 +219,7 @@ def grant_position(op, position_id, user_id=None, role_id=None):
 
 def position_id_by_name(name):
     position = PositionDesc.objects(soft_del=False, name=name).first()
-    return str(position.id)
+    return str(position.id) if position else None
 
 
 def position_ids_by_names(names):
