@@ -1,5 +1,4 @@
 # coding:utf-8
-import time
 import hashlib
 import logging
 import requests
@@ -19,7 +18,7 @@ class DingtalkApi(object):
         token_key_prefix = kwargs.get('corp_id') or ''
         self.api_client = get_api_client(config_dict=kwargs,
                                          token_store=cache,
-                                         token_key_prefix= token_key_prefix)
+                                         token_key_prefix=token_key_prefix)
 
     def _api(self, method, path, **kw):
         url = '%s%s' % ('https://oapi.dingtalk.com', path)
@@ -68,17 +67,37 @@ if getattr(conf, 'DINGTALK', None):
     dingtalk_obj = DingtalkApi(**conf.DINGTALK)
 
 
-def set_user_info_from_dingtalk(user, dingtalk_info, overwrite=False):
+def set_user_info_from_dingtalk(user, dingtalk_info, overwrite=None):
     '''
     Set user.info based on dingtalk_info.
     '''
-    fields = ['name', 'email', 'mobile', 'jobnumber', 'avatar']
+    overwrite = overwrite if overwrite is not None\
+                else conf.USER_INFO_DINGTALK_DEFAULT_OVERWRITE
+    fields = conf.USER_INFO_DINGTALK_FIELDS
     user.info['dingtalk_id'] = dingtalk_info['userid']
     for field in fields:
         if user.info.get(field) != dingtalk_info.get(field):
             if user.info.get(field) and not overwrite:
                 continue
+            if field == 'name':
+                user.name = dingtalk_info.get(field)
             user.info[field] = dingtalk_info.get(field)
+
+
+def get_user_by_dingtalk_info(dingtalk_info):
+    '''
+    Get a user base on conf.USER_DINGTALK_PRIMARY_FIELDS.
+    '''
+    fields = getattr(conf, "USER_DINGTALK_PRIMARY_FIELDS", [])
+    for field in fields:
+        value = dingtalk_info.get(field)
+        if not value:
+            continue
+        user = User.objects(**{("info__%s" % field): value,
+                               "soft_del": False}).first()
+        if user:
+            return user
+    return None
 
 
 def get_or_create_dingtalk_user(dingtalk_id, dingtalk_info):
@@ -87,36 +106,34 @@ def get_or_create_dingtalk_user(dingtalk_id, dingtalk_info):
     if conf.DINGTALK_AUTO_CREATE_USER is enabled, a new pauli
     user will be created when no user is matched current
     dingtalk login object.
+    The fucntion shall return a (user, login) 2-tuple.
     '''
     user = None
     with cache_lock('dingtalk_%s' % dingtalk_id):
         login = DingtalkLogin.objects(dingtalk_id=dingtalk_id).first()
         if login:
-            user = User.objects(id=login.user_id).first()
-            if user and not user.soft_del:
+            user = User.objects(id=login.user_id,
+                                soft_del=False).first()
+            if user:
                 set_user_info_from_dingtalk(user, dingtalk_info)
                 user.save()
-            login.info = dingtalk_info
-            login.save()
+                login.info = dingtalk_info
+                login.save()
         else:
-            email = dingtalk_info.get('email') or dingtalk_info.get('orgEmail')
-            if email:
-                user = User.objects(info__email=email).first()
-                if user and not user.soft_del:
-                    set_user_info_from_dingtalk(user, dingtalk_info)
-                    user.save()
-                    login = DingtalkLogin(user_id=str(user.id),
-                                          dingtalk_id=dingtalk_id,
-                                          info=dingtalk_info)
-                    login.save()
-                elif getattr(conf, 'DINGTALK_AUTO_CREATE_USER', None):
-                    user = User(name=dingtalk_info.get('name'))
-                    set_user_info_from_dingtalk(user, dingtalk_info)
-                    user.save()
-                    login = DingtalkLogin(user_id=str(user.id),
-                                          dingtalk_id=dingtalk_id,
-                                          info=dingtalk_info)
-                    login.save()
+            user = get_user_by_dingtalk_info(dingtalk_info)
+            if user:
+                set_user_info_from_dingtalk(user, dingtalk_info)
+                user.save()
+                login.info = dingtalk_info
+                login.save()
+            elif getattr(conf, 'DINGTALK_AUTO_CREATE_USER', None):
+                user = User(name=dingtalk_info.get('name'))
+                set_user_info_from_dingtalk(user, dingtalk_info)
+                user.save()
+                login = DingtalkLogin(user_id=str(user.id),
+                                      dingtalk_id=dingtalk_id,
+                                      info=dingtalk_info)
+                login.save()
             if login:
                 logger.info({"action": "createDingtalkUser",
                              "user_id": str(user.id),
