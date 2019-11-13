@@ -46,9 +46,9 @@ class UserAuditLog(Document):
         collection_name = doc._collection.name\
                           if doc._collection else str(doc)
         if user_id_field_name:
-            user_id = getattr(doc, user_id_field_name)
+            user_id = str(getattr(doc, user_id_field_name))
         elif getattr(doc, 'user_id', None):
-            user_id = doc.user_id
+            user_id = str(doc.user_id)
         else:
             user_id = None
         if not user_id:
