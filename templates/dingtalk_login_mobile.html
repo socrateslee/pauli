@@ -17,12 +17,13 @@
           dd.runtime.permission.requestAuthCode({
             corpId: "{{ dingtalk_data.corpId }}",
             onSuccess: function(result){
-                location.replace(location.protocol 
-                                 + "//" + location.host 
-                                 + "/pauli/auth/web/dingtalk/success?code=" 
-                                 + result.code
-                                 + "&next="
-                                 + encodeURIComponent(next_url));
+              dd.biz.util.openLink({
+                url: location.protocol
+                     + "//" + location.host
+                     + "/pauli/auth/web/dingtalk/success?code="
+                     + result.code
+                     + "&next="
+                     + encodeURIComponent(next_url)});
             },
             onFail: function(err){
                 notify("permission error: " + JSON.stringify(err));
