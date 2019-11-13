@@ -38,6 +38,8 @@ if 'dingtalk' in conf.LOGIN_METHODS:
 
     @pauli_root.route('/auth/web/dingtalk/login', methods=['GET'])
     def dingtalk_login():
+        if flask.request.headers.get("X-Forwarded-Proto") == 'https':
+            flask.request.environ['wsgi.url_scheme'] = 'https'
         next_url = flask.request.args.get('next')
         if common.is_logined(flask.request, flask.session) and next_url:
             return flask.redirect(next_url)
