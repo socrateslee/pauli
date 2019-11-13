@@ -124,7 +124,9 @@ def get_or_create_dingtalk_user(dingtalk_id, dingtalk_info):
             if user:
                 set_user_info_from_dingtalk(user, dingtalk_info)
                 user.save()
-                login.info = dingtalk_info
+                login = DingtalkLogin(user_id=str(user.id),
+                                      dingtalk_id=dingtalk_id,
+                                      info=dingtalk_info)
                 login.save()
             elif getattr(conf, 'DINGTALK_AUTO_CREATE_USER', None):
                 user = User(name=dingtalk_info.get('name'))
