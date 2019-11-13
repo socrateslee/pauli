@@ -18,7 +18,7 @@ class User(Document):
     keywords = ListField()
 
     def save(self):
-        UserAuditLog.record(self)
+        UserAuditLog.record(self, user_id_field_name='id')
         self.keywords = []
         if self.name:
             self.keywords.append(self.name)
@@ -47,10 +47,10 @@ class UserAuditLog(Document):
                           if doc._collection else str(doc)
         if user_id_field_name:
             user_id = getattr(doc, user_id_field_name)
-        elif collection_name == 'user':
-            user_id = str(doc.id)
+        elif getattr(doc, 'user_id', None):
+            user_id = doc.user_id
         else:
-            user_id = getattr(doc, 'user_id')
+            user_id = None
         if not user_id:
             return
         if not getattr(doc, '_changed_fields', None):
@@ -65,7 +65,7 @@ class UserAuditLog(Document):
             for k, v in i.items():
                 ua_log.delta.append([k, v])
         try:
-            if flask.request:
+            if flask.request and getattr(flask.request, "user", None):
                 ua_log.editor_id = str(flask.request.user.id)
                 ua_log.editor_name = flask.request.user.name
                 ua_log.editor_info = {}
