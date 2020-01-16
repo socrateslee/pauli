@@ -536,7 +536,7 @@ def api_position_leaders_info():
 @pauli_root.route('/perm/api/position/tree', methods=['GET'])
 @perm_required()
 def api_position_tree():
-    extend = True if flask.request.args.get('extend') else False
+    extend = True if flask.request.args.get('extend') == '1' else False
     position_id = flask.request.args.get('position_id')
     extra_fields = flask.request.args.get('extra_fields') or []
     if extra_fields:
